@@ -8,7 +8,7 @@
               "name": "CLangBuild",
               "type": "cppdbg",
               "request": "launch",
-              "program": "${fileDirname}/build/main",
+              "program": "${workspaceFolder}/build/main",
               "args": [],
               "stopAtEntry": false,
               "cwd": "${workspaceFolder}",
