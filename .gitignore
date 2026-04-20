@@ -1,0 +1,12 @@
+# 忽略编译生成的二进制文件夹
+bin/
+
+# 忽略 macOS 生成的调试符号文件夹
+*.dSYM/
+
+# 忽略 macOS 系统生成的索引文件
+.DS_Store
+
+# 忽略 VS Code 的本地状态（可选，如果你想共享配置则不忽略 .vscode/）
+.vscode/ipch/
+.vscode/msvc.cache
