@@ -5,6 +5,9 @@
 #include "ToolsTest/ToolsTest.h"
 #include "TimerTest/Timer.h"
 #include "LRUCacheTest/LRUCache.h"
+#include "MyString/MyString.h"
+#include "MyVector/MyVector.h"
+
 int main()
 {
        LOG_DEBUG << "start main";
