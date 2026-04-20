@@ -2,12 +2,22 @@
 #include "SingletonTest/LazySingleton.h"
 #include "ThreadTest/ProduceConsumers.h"
 #include "LogTest/Logger.h"
+#include "ToolsTest/ToolsTest.h"
+#include "TimerTest/Timer.h"
 int main()
 {
        LOG_DEBUG << "start main";
        LazySingleton::GetInstance()->Show();
        
+       Timer Timer;
+       Timer.Start([](){
+              auto now = std::chrono::system_clock::now();
+              auto currentTime = std::chrono::system_clock::to_time_t(now);
+              LOG_DEBUG << "Timer Loop:" << currentTime;
+       });
+       
        {
+              LOG_DEBUG << "start producer  and consumer";
               // 1. 初始化生产者消费者管理对象，设置缓冲区容量为 3
               // 此时 isStop 为 false，mutex 和 condition_variable 已准备就绪
               ProduceConsumers q(3);

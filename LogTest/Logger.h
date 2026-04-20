@@ -4,6 +4,8 @@
 #include <ctime>
 #include <sstream>
 #include <thread>
+#include <fstream>
+#include <filesystem> 
 
 enum LogLevel{
        DEBUG = 0,
@@ -21,15 +23,52 @@ public:
               return &Instance;
        }
 
+       void SetLogFile(const std::string& filename) 
+       {
+              std::lock_guard<std::mutex> lock(mtx);
+              
+              try {
+                     // 1. 获取文件所属的目录路径
+                     std::filesystem::path filePath(filename);
+                     std::filesystem::path parentPath = filePath.parent_path();
+
+                     // 2. 如果目录路径不为空且不存在，则递归创建目录
+                     if (!parentPath.empty() && !std::filesystem::exists(parentPath)) 
+                     {
+                            std::filesystem::create_directories(parentPath);
+                     }
+
+                     // 3. 打开文件（ios::app 模式下，如果文件不存在会自动创建文件）
+                     if (fileStream.is_open()) {
+                            fileStream.close();
+                     }
+                     
+                     fileStream.open(filename, std::ios::app);
+                     
+                     if (!fileStream) {
+                            std::cerr << "无法创建或打开日志文件: " << filename << std::endl;
+                     }
+              } catch (const std::filesystem::filesystem_error& e) {
+                     std::cerr << "文件系统错误: " << e.what() << std::endl;
+              }
+       }
+
        void Log(LogLevel level, const std::string& file, int line, const std::string& message) 
        {
         std::lock_guard<std::mutex> lock(mtx);
-        
-        std::cout << "[" << GetCurrentTime() << "] "
+        std::stringstream logLine;
+        logLine << "[" << GetCurrentTime() << "] "
                   << "[" << LevelToString(level) << "] "
                   << "[" << std::this_thread::get_id() << "] "
                   << "[" << file << ":" << line << "] "
                   << message << std::endl;
+       std::string finalLog = logLine.str();
+       std::cout << finalLog;
+       if (fileStream.is_open()) 
+       {
+            fileStream << finalLog << std::endl;
+            fileStream.flush(); 
+        }
     }
 
 protected:
@@ -44,6 +83,7 @@ protected:
                      default :  return "UNKNOWN";
               }
        }
+
        std::string GetCurrentTime()
        {
               auto now = std::chrono::system_clock::now();
@@ -52,12 +92,14 @@ protected:
               ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S");
               return ss.str();
        }
+       
 private:
        Logger() = default;
        ~Logger(){};
 
 private:
        std::mutex mtx;
+       std::fstream fileStream;
 };
 
 class LogMessage {
@@ -70,16 +112,17 @@ public:
     }
 
     template <typename T>
-    LogMessage& operator<<(const T& msg) {
-        Oss << msg;
-        return *this;
+    LogMessage& operator << (const T& msg)
+    {
+       Oss << msg;
+       return *this;
     }
 
 private:
-    std::ostringstream Oss;
-    LogLevel Level;
     std::string File;
     int Line;
+    LogLevel Level;
+    std::ostringstream Oss;
 };
 
 #define LOG_DEBUG LogMessage(LogLevel::DEBUG, __FILE__, __LINE__)
