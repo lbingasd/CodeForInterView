@@ -4,6 +4,7 @@
 #include "LogTest/Logger.h"
 #include "ToolsTest/ToolsTest.h"
 #include "TimerTest/Timer.h"
+#include "LRUCacheTest/LRUCache.h"
 int main()
 {
        LOG_DEBUG << "start main";
@@ -15,7 +16,7 @@ int main()
               auto currentTime = std::chrono::system_clock::to_time_t(now);
               LOG_DEBUG << "Timer Loop:" << currentTime;
        });
-       
+
        {
               LOG_DEBUG << "start producer  and consumer";
               // 1. 初始化生产者消费者管理对象，设置缓冲区容量为 3
