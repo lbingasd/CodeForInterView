@@ -1,8 +1,10 @@
 #include <iostream>
 #include "SingletonTest/LazySingleton.h"
 #include "ThreadTest/ProduceConsumers.h"
+#include "LogTest/Logger.h"
 int main()
 {
+       LOG_DEBUG << "start main";
        LazySingleton::GetInstance()->Show();
        
        {
@@ -16,7 +18,7 @@ int main()
                * - std::ref(q)：非常关键！强制以引用方式传递对象。
                * 如果不加 ref，thread 会尝试拷贝 q，而 q 包含 mutex（不可拷贝），会导致编译报错。
                */
-              
+
               // 启动两个生产者线程，分别传入不同的 ID (1 和 2)
               thread p1(ProducerTask, std::ref(q), 1);
               thread p2(ProducerTask, std::ref(q), 2);
