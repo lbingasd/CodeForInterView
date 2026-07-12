@@ -172,7 +172,7 @@ std::vector<int> topKFrequent(std::vector<int>& nums, int k) {
 
         // 2. 自定义比较函数的小顶堆
         auto comp = [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
-            return a.second > b.second; // 频次小的在堆顶
+            return a.second > b.second; // 频次小的在堆顶;a.second < b.second; 默认大顶堆
         };
         std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, decltype(comp)> min_heap(comp);
 
