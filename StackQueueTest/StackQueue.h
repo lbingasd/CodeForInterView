@@ -163,34 +163,34 @@ std::vector<int> dailyTemperatures(const std::vector<int>& temperatures)
  * 思路：先用哈希表计数，再用小根堆保留频率最高的 K 个元素。
  * 复杂度：时间 O(N log K)，空间 O(N)
  */
-std::vector<int> topKFrequent(const std::vector<int>& nums, int k)
-{
-    // 第一遍统计每个数字出现的次数。
-    std::unordered_map<int, int> freq;
-    for (int num : nums) {
-        ++freq[num];
-    }
-
-    using Item = std::pair<int, int>; // {频率, 数值}
-    // 小根堆只保留 K 个最大频率，其中最小的频率在堆顶。
-    std::priority_queue<Item, std::vector<Item>, std::greater<Item>> heap;
-    for (const auto& entry : freq) {
-        heap.push({entry.second, entry.first});
-        if (static_cast<int>(heap.size()) > k) {
-            // 堆大小超过 K 时，移除当前频率最小的元素。
-            heap.pop();
+std::vector<int> topKFrequent(std::vector<int>& nums, int k) {
+        // 1. 统计频次
+        std::unordered_map<int, int> count_map;
+        for (int num : nums) {
+            count_map[num]++;
         }
-    }
 
-    std::vector<int> result;
-    while (!heap.empty()) {
-        // 小根堆弹出顺序是从低频到高频。
-        result.push_back(heap.top().second);
-        heap.pop();
-    }
-    // 反转后让高频元素排在前面。
-    std::reverse(result.begin(), result.end());
-    return result;
-}
+        // 2. 自定义比较函数的小顶堆
+        auto comp = [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+            return a.second > b.second; // 频次小的在堆顶
+        };
+        std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, decltype(comp)> min_heap(comp);
 
+        // 3. 遍历哈希表维护固定大小为 k 的小顶堆
+        for (const auto& kv : count_map) {
+            min_heap.push(kv);
+            if (min_heap.size() > k) {
+                min_heap.pop(); // 弹出频次最低的元素
+            }
+        }
+
+        // 4. 取出结果
+        std::vector<int> result(k);
+        for (int i = k - 1; i >= 0; i--) {
+            result[i] = min_heap.top().first;
+            min_heap.pop();
+        }
+
+        return result;
+    }
 }
