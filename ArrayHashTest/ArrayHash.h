@@ -119,29 +119,23 @@ std::vector<std::vector<int>> mergeIntervals(std::vector<std::vector<int>> inter
 /**
  * 5. 和为 K 的子数组
  * 难度：中等
- * 思路：prefixSum[j] - prefixSum[i] == k，统计历史前缀和出现次数。
+ * 思路：pre[i] 为 [0..i] 里所有数的和,pre[i]−pre[j−1]==k，统计历史前缀和出现次数。
  * 复杂度：时间 O(N)，空间 O(N)
  */
-int subarraySum(const std::vector<int>& nums, int k)
+int subarraySum(std::vector<int>& nums, int k) 
 {
-    // 前缀和计数表用于记录某个历史前缀和出现过多少次。
-    std::unordered_map<int, int> countByPrefix;
-    // 空前缀用于处理从下标 0 开始的子数组。
-    countByPrefix[0] = 1;
-
-    int prefix = 0;
-    int result = 0;
-    for (int num : nums) {
-        prefix += num;
-        // 需要查找是否存在历史前缀和等于 prefix - k。
-        auto it = countByPrefix.find(prefix - k);
-        if (it != countByPrefix.end()) {
-            result += it->second;
+        std::unordered_map<int, int> mp;
+        mp[0] = 1;
+        int count = 0, pre = 0;
+        for (auto& x:nums) 
+        {
+            pre += x;
+            if (mp.find(pre - k) != mp.end()) 
+            {
+                count += mp[pre - k];
+            }
+            mp[pre]++;
         }
-        // 当前前缀和加入统计，供后续子数组使用。
-        ++countByPrefix[prefix];
-    }
-    return result;
+        return count;
 }
-
 }
