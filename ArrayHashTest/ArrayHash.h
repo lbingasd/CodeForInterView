@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <climits>
+#include <deque>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -136,6 +138,94 @@ int subarraySum(std::vector<int>& nums, int k)
             }
             mp[pre]++;
         }
-        return count;
+    return count;
+}
+
+/**
+ * 6. 无重复字符的最长子串
+ * 依据：LeetCode Top Interview 150 / Sliding Window 题单中的经典可变窗口题。
+ * 思路：右指针扩展，重复字符出现时移动左指针并维护频次。
+ * 复杂度：时间 O(N)，空间 O(字符集大小)
+ */
+int lengthOfLongestSubstring(const std::string& s)
+{
+    std::unordered_map<char, int> count;
+    int left = 0;
+    int best = 0;
+    for (int right = 0; right < static_cast<int>(s.size()); ++right) {
+        ++count[s[right]];
+        while (count[s[right]] > 1) {
+            --count[s[left++]];
+        }
+        best = std::max(best, right - left + 1);
+    }
+    return best;
+}
+
+/**
+ * 7. 长度最小的子数组
+ * 依据：LeetCode Sliding Window 题单中的正数数组可变窗口题。
+ * 思路：和达到 target 后不断收缩左边界，保留最短合法窗口。
+ * 注意：nums 必须为正整数，才能保证窗口单调收缩。
+ */
+int minSubArrayLen(int target, const std::vector<int>& nums)
+{
+    int left = 0;
+    long long sum = 0;
+    int best = INT_MAX;
+    for (int right = 0; right < static_cast<int>(nums.size()); ++right) {
+        sum += nums[right];
+        while (sum >= target) {
+            best = std::min(best, right - left + 1);
+            sum -= nums[left++];
+        }
+    }
+    return best == INT_MAX ? 0 : best;
+}
+
+/**
+ * 8. 找到字符串中所有字母异位词
+ * 依据：LeetCode Sliding Window 题单中的固定长度频次窗口题。
+ * 思路：维护长度为 p.size() 的窗口，并比较 26 个小写字母的计数。
+ */
+std::vector<int> findAnagrams(const std::string& s, const std::string& p)
+{
+    if (p.empty() || p.size() > s.size()) return {};
+    std::vector<int> need(26), window(26), result;
+    for (char ch : p) ++need[ch - 'a'];
+    for (int right = 0; right < static_cast<int>(s.size()); ++right) {
+        ++window[s[right] - 'a'];
+        if (right >= static_cast<int>(p.size())) {
+            --window[s[right - p.size()] - 'a'];
+        }
+        if (window == need) {
+            result.push_back(right - static_cast<int>(p.size()) + 1);
+        }
+    }
+    return result;
+}
+
+/**
+ * 9. 滑动窗口最大值
+ * 依据：LeetCode 239，题目明确要求滑动窗口，并使用单调队列优化。
+ * 思路：deque 保存可能成为最大值的下标，队列值保持单调递减。
+ * 复杂度：时间 O(N)，空间 O(K)
+ */
+std::vector<int> maxSlidingWindow(const std::vector<int>& nums, int k)
+{
+    if (k <= 0 || k > static_cast<int>(nums.size())) return {};
+    std::deque<int> candidates;
+    std::vector<int> result;
+    for (int right = 0; right < static_cast<int>(nums.size()); ++right) {
+        while (!candidates.empty() && candidates.front() <= right - k) {
+            candidates.pop_front();
+        }
+        while (!candidates.empty() && nums[candidates.back()] <= nums[right]) {
+            candidates.pop_back();
+        }
+        candidates.push_back(right);
+        if (right >= k - 1) result.push_back(nums[candidates.front()]);
+    }
+    return result;
 }
 }
