@@ -11,7 +11,14 @@ int kthLargest(const std::vector<int>& nums, int k)
 {
     if (k <= 0 || k > static_cast<int>(nums.size())) return 0;
     std::priority_queue<int, std::vector<int>, std::greater<int>> heap;
-    for (int value : nums) { heap.push(value); if (heap.size() > static_cast<size_t>(k)) heap.pop(); }
+    for (int value : nums) 
+    { 
+        heap.push(value); 
+        if (heap.size() > static_cast<size_t>(k)) 
+        {
+            heap.pop();
+        }
+    }
     return heap.top();
 }
 
