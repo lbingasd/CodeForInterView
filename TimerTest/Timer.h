@@ -25,6 +25,7 @@ public:
                      while (true)
                      {
                             {
+                                   // 使用 wait_for 而不是 sleep，是为了能在 Stop() 时被 notify_all() 立即唤醒，及时退出线程
                                    // wait_for 会阻塞直到：
                                    //1. 超时(msec)；
                                    //2. 被 cv.notify_all() 唤醒
