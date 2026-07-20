@@ -206,7 +206,44 @@ std::vector<int> findAnagrams(const std::string& s, const std::string& p)
 }
 
 /**
- * 9. 滑动窗口最大值
+ * 9. 接雨水 (LeetCode 42) — 双指针解法
+ * 难度：困难
+ * 思路：双指针从两端向中间收缩。对于每个位置，能接的水量由左右两侧
+ *       较矮的一侧决定。维护 leftMax 和 rightMax，哪边矮就移动哪边。
+ * 复杂度：时间 O(N)，空间 O(1)
+ */
+int trap(const std::vector<int>& height)
+{
+    int left = 0, right = static_cast<int>(height.size()) - 1;
+    // leftMax：左侧已遍历区域的最高柱子；rightMax：右侧已遍历区域的最高柱子。
+    int leftMax = 0, rightMax = 0;
+    int water = 0;
+
+    while (left < right) {
+        // 哪边矮就处理哪边 —— 因为当前位置的水量由较矮一侧决定。
+        if (height[left] < height[right]) {
+            if (height[left] >= leftMax) {
+                // 当前柱子比左侧最高还高，更新 leftMax，此处无法接水。
+                leftMax = height[left];
+            } else {
+                // 当前柱子低于 leftMax，可以接水。
+                water += leftMax - height[left];
+            }
+            ++left;
+        } else {
+            if (height[right] >= rightMax) {
+                rightMax = height[right];
+            } else {
+                water += rightMax - height[right];
+            }
+            --right;
+        }
+    }
+    return water;
+}
+
+/**
+ * 10. 滑动窗口最大值
  * 依据：LeetCode 239，题目明确要求滑动窗口，并使用单调队列优化。
  * 思路：deque 保存可能成为最大值的下标，队列值保持单调递减。
  * 复杂度：时间 O(N)，空间 O(K)
